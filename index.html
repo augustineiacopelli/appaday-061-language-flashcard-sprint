@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Language Flashcard Sprint | AppADay 061</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --slate: #26343B;
+    --slate-dark: #1B262B;
+    --chalk: #F2EDE0;
+    --chalk-dim: #C9CCC4;
+    --card-paper: #FAF6EC;
+    --card-paper-back: #F0E9D8;
+    --marigold: #E8B84B;
+    --marigold-dark: #C79632;
+    --brick: #C1553D;
+    --sage: #7FA65C;
+    --ink: #2B3A42;
+    --line: rgba(242,237,224,0.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100dvh;
+    background: var(--slate);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.03) 0, transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(255,255,255,0.025) 0, transparent 40%);
+    color: var(--chalk);
+    font-family: 'Work Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #app {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .brand-mark {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--marigold);
+    letter-spacing: 0.5px;
+  }
+
+  .brand-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--chalk-dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .gear-btn {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--chalk);
+    cursor: pointer;
+    font-size: 17px;
+  }
+  .gear-btn:active { transform: scale(0.94); }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 18px 40px;
+    gap: 22px;
+  }
+
+  .portal-link {
+    text-align: center;
+    padding: 12px;
+    font-size: 12px;
+  }
+  .portal-link a {
+    color: var(--chalk-dim);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+  .portal-link a:hover { color: var(--marigold); }
+
+  /* Stamp / streak badge */
+  .stamp {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    border: 3px solid var(--marigold);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-6deg);
+    position: relative;
+  }
+  .stamp::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1px dashed var(--marigold-dark);
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+  .stamp-num {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 30px;
+    color: var(--marigold);
+    line-height: 1;
+  }
+  .stamp-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--chalk-dim);
+    margin-top: 4px;
+  }
+
+  .headline {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 30px;
+    text-align: center;
+    color: var(--chalk);
+    margin: 0;
+  }
+
+  .subline {
+    font-size: 14px;
+    color: var(--chalk-dim);
+    text-align: center;
+    max-width: 320px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .lang-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--slate);
+    background: var(--marigold);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .setup-hero {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 320px;
+  }
+  .chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--chalk);
+    border: 1px solid var(--line);
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(242,237,224,0.04);
+  }
+
+  .setup-note {
+    font-size: 12px;
+    color: var(--chalk-dim);
+    text-align: center;
+    max-width: 300px;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  select, input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--slate-dark);
+    color: var(--chalk);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15px;
+  }
+  select:focus, input:focus {
+    outline: 2px solid var(--marigold);
+    outline-offset: 1px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .field-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--chalk-dim);
+  }
+
+  .btn {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    max-width: 320px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+  .btn:disabled:active { transform: none; }
+  .btn-primary { background: var(--marigold); color: var(--slate-dark); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--chalk);
+    border: 1px solid var(--line);
+  }
+  .btn-sage { background: var(--sage); color: var(--slate-dark); }
+  .btn-brick { background: var(--brick); color: var(--chalk); }
+  .btn-row { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+  .btn-row .btn { max-width: none; }
+
+  .stack { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+
+  /* Flashcard */
+  .card-stage {
+    width: 100%;
+    max-width: 320px;
+    height: 340px;
+    perspective: 1200px;
+  }
+  .flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4,0.2,0.2,1);
+    cursor: pointer;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 4px;
+    background: var(--card-paper);
+    color: var(--ink);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    transform: rotate(-1.4deg);
+    background-image: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(43,58,66,0.06) 28px);
+  }
+  .face.back {
+    transform: rotateY(180deg) rotate(1.4deg);
+    background: var(--card-paper-back);
+  }
+  .face-index {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(43,58,66,0.5);
+    border-bottom: 1px solid rgba(43,58,66,0.15);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  .face-word {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .face-pos {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--brick);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 6px;
+  }
+  .face-hint {
+    margin-top: auto;
+    font-size: 12px;
+    color: rgba(43,58,66,0.5);
+    text-align: center;
+  }
+  .face-translation {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--ink);
+  }
+  .face-example {
+    margin-top: 16px;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .face-example-en {
+    margin-top: 6px;
+    font-size: 13px;
+    color: rgba(43,58,66,0.65);
+    line-height: 1.4;
+  }
+
+  .dots { display: flex; gap: 8px; }
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    border: 1px solid var(--marigold);
+    background: transparent;
+  }
+  .dot.done { background: var(--marigold); }
+  .dot.current { background: var(--chalk); border-color: var(--chalk); }
+
+  .loading-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .chalk-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--line);
+    border-top-color: var(--marigold);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-box {
+    max-width: 320px;
+    border: 1px dashed var(--brick);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--chalk);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,20,23,0.72);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+  }
+  @media (min-width: 560px) {
+    .modal-overlay { align-items: center; }
+  }
+  .modal {
+    background: var(--slate-dark);
+    border: 1px solid var(--line);
+    border-radius: 16px 16px 0 0;
+    padding: 22px 20px 28px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 88dvh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  @media (min-width: 560px) {
+    .modal { border-radius: 16px; }
+  }
+  .modal h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 26px;
+    margin: 0;
+    color: var(--marigold);
+  }
+  .modal-close {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: var(--chalk-dim);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+  }
+  .help-text {
+    font-size: 12px;
+    color: var(--chalk-dim);
+    line-height: 1.5;
+  }
+  .help-text a { color: var(--marigold); }
+
+  .review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 340px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .review-item {
+    background: var(--slate-dark);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+  .review-item .rw {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--marigold);
+  }
+  .review-item .rt {
+    font-size: 12px;
+    color: var(--chalk-dim);
+    margin-top: 2px;
+  }
+  .review-item.expanded .rt { color: var(--chalk); }
+
+  .stat-row {
+    display: flex;
+    gap: 22px;
+    justify-content: center;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--marigold);
+  }
+  .stat-lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--chalk-dim);
+    margin-top: 2px;
+  }
+
+  .hidden { display: none !important; }
+
+  .confirm-actions { display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">Sprint</span>
+      <span class="brand-sub">AppADay 061</span>
+    </div>
+    <button class="gear-btn" id="gearBtn" aria-label="Settings">&#9881;</button>
+  </header>
+
+  <main id="main"></main>
+
+  <div class="portal-link">
+    <a href="https://augustineiacopelli.github.io/appaday/">&larr; back to AppADay portfolio</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var LS = {
+    apikey: "appaday-061-apikey",
+    language: "appaday-061-language",
+    level: "appaday-061-level",
+    setup: "appaday-061-setupdone",
+    streak: "appaday-061-streak",
+    lastdate: "appaday-061-laststudydate",
+    history: "appaday-061-history",
+    today: "appaday-061-todaycards"
+  };
+
+  var LANGUAGES = [
+    "Spanish", "French", "German", "Italian", "Portuguese",
+    "Japanese", "Mandarin Chinese", "Korean", "Russian", "Arabic",
+    "Latin", "Dutch"
+  ];
+  var LEVELS = ["Beginner", "Intermediate", "Advanced"];
+
+  var main = document.getElementById("main");
+  var gearBtn = document.getElementById("gearBtn");
+
+  function todayStr() {
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+
+  function daysBetween(a, b) {
+    var da = new Date(a + "T00:00:00");
+    var db = new Date(b + "T00:00:00");
+    return Math.round((db - da) / 86400000);
+  }
+
+  function getHistory() {
+    try {
+      var raw = localStorage.getItem(LS.history);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function saveHistory(list) {
+    if (list.length > 300) list = list.slice(list.length - 300);
+    localStorage.setItem(LS.history, JSON.stringify(list));
+  }
+
+  function getStreak() {
+    var s = parseInt(localStorage.getItem(LS.streak) || "0", 10);
+    return isNaN(s) ? 0 : s;
+  }
+
+  function currentStreakDisplay() {
+    var last = localStorage.getItem(LS.lastdate);
+    var streak = getStreak();
+    if (!last) return 0;
+    var gap = daysBetween(last, todayStr());
+    if (gap > 1) return 0;
+    return streak;
+  }
+
+  function completedToday() {
+    return localStorage.getItem(LS.lastdate) === todayStr();
+  }
+
+  function markDayComplete() {
+    var last = localStorage.getItem(LS.lastdate);
+    var streak = getStreak();
+    if (last) {
+      var gap = daysBetween(last, todayStr());
+      if (gap === 1) streak = streak + 1;
+      else if (gap === 0) { /* already counted */ }
+      else streak = 1;
+    } else {
+      streak = 1;
+    }
+    localStorage.setItem(LS.streak, String(streak));
+    localStorage.setItem(LS.lastdate, todayStr());
+    return streak;
+  }
+
+  function esc(s) {
+    var d = document.createElement("div");
+    d.textContent = s == null ? "" : String(s);
+    return d.innerHTML;
+  }
+
+  function render(html) {
+    main.innerHTML = html;
+  }
+
+  // ---------- Settings modal ----------
+  function openSettings() {
+    var overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.id = "settingsOverlay";
+    var apikey = localStorage.getItem(LS.apikey) || "";
+    var language = localStorage.getItem(LS.language) || LANGUAGES[0];
+    var level = localStorage.getItem(LS.level) || LEVELS[0];
+
+    var langOpts = LANGUAGES.map(function (l) {
+      return '<option value="' + esc(l) + '"' + (l === language ? " selected" : "") + ">" + esc(l) + "</option>";
+    }).join("");
+    var levelOpts = LEVELS.map(function (l) {
+      return '<option value="' + esc(l) + '"' + (l === level ? " selected" : "") + ">" + esc(l) + "</option>";
+    }).join("");
+
+    overlay.innerHTML =
+      '<div class="modal">' +
+        '<button class="modal-close" id="closeSettings">CLOSE</button>' +
+        '<h2>Settings</h2>' +
+        '<div class="field-group">' +
+          '<span class="field-label">Claude API Key</span>' +
+          '<input type="password" id="apikeyInput" placeholder="sk-ant-..." value="' + esc(apikey) + '">' +
+          '<span class="help-text">Stored only in this browser. Get a key at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.</span>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<span class="field-label">Language</span>' +
+          '<select id="languageSelect">' + langOpts + '</select>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<span class="field-label">Level</span>' +
+          '<select id="levelSelect">' + levelOpts + '</select>' +
+        '</div>' +
+        '<button class="btn btn-primary" id="saveSettings">Save Settings</button>' +
+        '<button class="btn btn-ghost" id="resetProgress">Reset All Progress</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    document.getElementById("closeSettings").addEventListener("click", function () {
+      document.body.removeChild(overlay);
+    });
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) document.body.removeChild(overlay);
+    });
+    document.getElementById("saveSettings").addEventListener("click", function () {
+      var key = document.getElementById("apikeyInput").value.trim();
+      var lang = document.getElementById("languageSelect").value;
+      var lvl = document.getElementById("levelSelect").value;
+      var alreadySetup = localStorage.getItem(LS.setup) === "true";
+      localStorage.setItem(LS.apikey, key);
+      localStorage.setItem(LS.language, lang);
+      localStorage.setItem(LS.level, lvl);
+      document.body.removeChild(overlay);
+      if (alreadySetup) {
+        renderHome();
+      } else {
+        renderSetup();
+      }
+    });
+    document.getElementById("resetProgress").addEventListener("click", function () {
+      openConfirm(
+        "Reset everything?",
+        "This clears your streak, word history, and today's session. This cannot be undone.",
+        function () {
+          localStorage.removeItem(LS.streak);
+          localStorage.removeItem(LS.lastdate);
+          localStorage.removeItem(LS.history);
+          localStorage.removeItem(LS.today);
+          document.body.removeChild(overlay);
+          renderHome();
+        }
+      );
+    });
+  }
+
+  function openConfirm(title, body, onConfirm) {
+    var overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.style.zIndex = "60";
+    overlay.innerHTML =
+      '<div class="modal">' +
+        '<h2>' + esc(title) + '</h2>' +
+        '<p class="help-text">' + esc(body) + '</p>' +
+        '<div class="confirm-actions">' +
+          '<button class="btn btn-ghost" id="confirmCancel">Cancel</button>' +
+          '<button class="btn btn-brick" id="confirmYes">Yes, Reset</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    document.getElementById("confirmCancel").addEventListener("click", function () {
+      document.body.removeChild(overlay);
+    });
+    document.getElementById("confirmYes").addEventListener("click", function () {
+      document.body.removeChild(overlay);
+      onConfirm();
+    });
+  }
+
+  gearBtn.addEventListener("click", openSettings);
+
+  // ---------- First run setup ----------
+  var HERO_SVG =
+    '<svg class="setup-hero" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<path d="M20 100 C20 40, 50 30, 108 40 L108 102 C50 92, 20 100, 20 100 Z" fill="none" stroke="#F2EDE0" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<path d="M196 100 C196 40, 166 30, 108 40 L108 102 C166 92, 196 100, 196 100 Z" fill="none" stroke="#F2EDE0" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<path d="M32 54 C58 47, 82 47, 100 52" fill="none" stroke="#E8B84B" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<path d="M32 68 C58 61, 82 61, 100 66" fill="none" stroke="#E8B84B" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<path d="M32 82 C52 76, 74 76, 92 80" fill="none" stroke="#E8B84B" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<circle cx="176" cy="24" r="15" fill="none" stroke="#E8B84B" stroke-width="2"/>' +
+      '<ellipse cx="176" cy="24" rx="6.5" ry="15" fill="none" stroke="#E8B84B" stroke-width="1.3"/>' +
+      '<path d="M161 24 L191 24" stroke="#E8B84B" stroke-width="1.3"/>' +
+      '<path d="M165 15 C172 19, 180 19, 187 15" fill="none" stroke="#E8B84B" stroke-width="1.1"/>' +
+      '<path d="M165 33 C172 29, 180 29, 187 33" fill="none" stroke="#E8B84B" stroke-width="1.1"/>' +
+      '<path d="M26 20 L44 12" stroke="#C1553D" stroke-width="3" stroke-linecap="round"/>' +
+      '<path d="M44 12 L50 18 L34 26 Z" fill="#C1553D" stroke="none"/>' +
+    '</svg>';
+
+  function renderSetup() {
+    var langOpts = LANGUAGES.map(function (l) {
+      return '<option value="' + esc(l) + '">' + esc(l) + "</option>";
+    }).join("");
+    var levelOpts = LEVELS.map(function (l) {
+      return '<option value="' + esc(l) + '">' + esc(l) + "</option>";
+    }).join("");
+    var hasKey = !!localStorage.getItem(LS.apikey);
+
+    render(
+      '<div class="stack">' +
+        HERO_SVG +
+        '<p class="headline">Welcome to your language sprint</p>' +
+        '<p class="subline">A little daily practice adds up fast. Get five new vocabulary cards every day, generated fresh by Claude, and watch a streak build one small sprint at a time.</p>' +
+        '<div class="chip-row">' +
+          '<span class="chip">5 cards a day</span>' +
+          '<span class="chip">12 languages</span>' +
+          '<span class="chip">3 levels</span>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<span class="field-label">Language</span>' +
+          '<select id="setupLanguage">' + langOpts + '</select>' +
+        '</div>' +
+        '<div class="field-group">' +
+          '<span class="field-label">Level</span>' +
+          '<select id="setupLevel">' + levelOpts + '</select>' +
+        '</div>' +
+        '<button class="btn btn-primary" id="setupStart"' + (hasKey ? '' : ' disabled') + '>Start My Streak</button>' +
+        (hasKey ?
+          '' :
+          '<button class="btn btn-ghost" id="setupOpenSettings">Add API Key in Settings</button>' +
+          '<p class="setup-note">Start My Streak unlocks once a Claude API key is saved in Settings.</p>'
+        ) +
+      '</div>'
+    );
+
+    document.getElementById("setupStart").addEventListener("click", function () {
+      if (!localStorage.getItem(LS.apikey)) return;
+      var lang = document.getElementById("setupLanguage").value;
+      var lvl = document.getElementById("setupLevel").value;
+      localStorage.setItem(LS.language, lang);
+      localStorage.setItem(LS.level, lvl);
+      localStorage.setItem(LS.setup, "true");
+      renderHome();
+    });
+
+    var setupOpenSettings = document.getElementById("setupOpenSettings");
+    if (setupOpenSettings) {
+      setupOpenSettings.addEventListener("click", openSettings);
+    }
+  }
+
+  // ---------- Home ----------
+  function renderHome() {
+    var language = localStorage.getItem(LS.language) || LANGUAGES[0];
+    var streak = currentStreakDisplay();
+    var history = getHistory();
+    var doneToday = completedToday();
+
+    var actionHtml;
+    if (doneToday) {
+      actionHtml =
+        '<p class="subline">Today&#39;s sprint is done. Come back tomorrow to keep the streak alive, or review what you&#39;ve learned so far.</p>' +
+        '<button class="btn btn-ghost" id="reviewBtn">Review Learned Words</button>';
+    } else {
+      actionHtml =
+        '<button class="btn btn-primary" id="startBtn">Begin Today&#39;s 5 Cards</button>' +
+        (history.length > 0 ? '<button class="btn btn-ghost" id="reviewBtn">Review Learned Words</button>' : '');
+    }
+
+    render(
+      '<div class="stack">' +
+        '<div class="stamp"><span class="stamp-num">' + streak + '</span><span class="stamp-label">day streak</span></div>' +
+        '<span class="lang-pill">' + esc(language) + '</span>' +
+        '<div class="stat-row">' +
+          '<div class="stat"><div class="stat-num">' + history.length + '</div><div class="stat-lbl">Words Seen</div></div>' +
+          '<div class="stat"><div class="stat-num">' + history.filter(function(w){return w.status==="known";}).length + '</div><div class="stat-lbl">Got It</div></div>' +
+        '</div>' +
+        actionHtml +
+      '</div>'
+    );
+
+    var startBtn = document.getElementById("startBtn");
+    if (startBtn) startBtn.addEventListener("click", beginSession);
+    var reviewBtn = document.getElementById("reviewBtn");
+    if (reviewBtn) reviewBtn.addEventListener("click", renderReview);
+  }
+
+  // ---------- Review ----------
+  function renderReview() {
+    var history = getHistory().slice().reverse();
+    var items = history.map(function (w, i) {
+      return '<div class="review-item" data-idx="' + i + '">' +
+        '<div class="rw">' + esc(w.word) + '</div>' +
+        '<div class="rt hidden-t" style="display:none;">' + esc(w.translation) + '</div>' +
+      '</div>';
+    }).join("");
+
+    render(
+      '<div class="stack">' +
+        '<p class="headline">Words So Far</p>' +
+        '<p class="subline">Tap a card to see the translation.</p>' +
+        '<div class="review-list">' + (items || '<p class="subline">No words yet. Complete a sprint first.</p>') + '</div>' +
+        '<button class="btn btn-ghost" id="backHome">Back</button>' +
+      '</div>'
+    );
+
+    var listItems = main.querySelectorAll(".review-item");
+    listItems.forEach(function (el) {
+      el.addEventListener("click", function () {
+        var t = el.querySelector(".rt");
+        var showing = t.style.display !== "none";
+        t.style.display = showing ? "none" : "block";
+        el.classList.toggle("expanded", !showing);
+      });
+    });
+
+    document.getElementById("backHome").addEventListener("click", renderHome);
+  }
+
+  // ---------- Session ----------
+  function beginSession() {
+    var cached = getTodayCache();
+    if (cached && cached.cards && cached.cards.length === 5) {
+      runSession(cached.cards, cached.results || [null, null, null, null, null], cached.index || 0);
+      return;
+    }
+    fetchCards();
+  }
+
+  function getTodayCache() {
+    try {
+      var raw = localStorage.getItem(LS.today);
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      if (obj.date !== todayStr()) return null;
+      return obj;
+    } catch (e) { return null; }
+  }
+
+  function saveTodayCache(cards, results, index) {
+    localStorage.setItem(LS.today, JSON.stringify({
+      date: todayStr(), cards: cards, results: results, index: index
+    }));
+  }
+
+  function renderLoading() {
+    render(
+      '<div class="loading-wrap">' +
+        '<div class="chalk-spinner"></div>' +
+        '<p class="subline">Drawing today&#39;s five cards...</p>' +
+      '</div>'
+    );
+  }
+
+  function fetchCards() {
+    var apikey = localStorage.getItem(LS.apikey);
+    if (!apikey) {
+      render(
+        '<div class="stack">' +
+          '<div class="error-box">Add a Claude API key in Settings before starting a sprint.</div>' +
+          '<button class="btn btn-primary" id="openSettingsFromError">Open Settings</button>' +
+        '</div>'
+      );
+      document.getElementById("openSettingsFromError").addEventListener("click", openSettings);
+      return;
+    }
+
+    renderLoading();
+
+    var language = localStorage.getItem(LS.language) || LANGUAGES[0];
+    var level = localStorage.getItem(LS.level) || LEVELS[0];
+    var history = getHistory();
+    var seenWords = history.slice(-60).map(function (w) { return w.word; }).join(", ");
+
+    var prompt =
+      "You are a language tutor generating flashcards for a spaced repetition app. " +
+      "Target language: " + language + ". Learner level: " + level + ". " +
+      "Return exactly 5 vocabulary words or short common phrases in " + language + " appropriate for a " + level + " learner. " +
+      (seenWords ? "Do not repeat any of these already-seen words: " + seenWords + ". " : "") +
+      "Respond with ONLY a raw JSON array, no markdown fences, no preamble, no explanation. " +
+      "Each element must be an object with exactly these keys: " +
+      '"word" (the vocabulary word or phrase in ' + language + '), ' +
+      '"pos" (part of speech, short, e.g. noun, verb, phrase), ' +
+      '"translation" (the English translation), ' +
+      '"example" (one natural example sentence in ' + language + ' using the word), ' +
+      '"exampleTranslation" (the English translation of that example sentence).';
+
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "x-api-key": apikey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1500,
+        messages: [{ role: "user", content: prompt }]
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.json().then(function (errBody) {
+            var msg = (errBody && errBody.error && errBody.error.message) || ("Request failed with status " + res.status);
+            throw new Error(msg);
+          }).catch(function () {
+            throw new Error("Request failed with status " + res.status);
+          });
+        }
+        return res.json();
+      })
+      .then(function (data) {
+        var textBlocks = (data.content || []).filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; });
+        var raw = textBlocks.join("\n").trim();
+        raw = raw.replace(/^```json/i, "").replace(/^```/, "").replace(/```$/, "").trim();
+        var cards;
+        try {
+          cards = JSON.parse(raw);
+        } catch (e) {
+          throw new Error("Could not read the cards Claude sent back. Try again.");
+        }
+        if (!Array.isArray(cards) || cards.length < 1) {
+          throw new Error("Claude did not return any cards. Try again.");
+        }
+        cards = cards.slice(0, 5);
+        var results = cards.map(function () { return null; });
+        saveTodayCache(cards, results, 0);
+        runSession(cards, results, 0);
+      })
+      .catch(function (err) {
+        render(
+          '<div class="stack">' +
+            '<div class="error-box">' + esc(err.message || "Something went wrong reaching Claude.") + '</div>' +
+            '<button class="btn btn-primary" id="retryFetch">Try Again</button>' +
+            '<button class="btn btn-ghost" id="backHomeErr">Back</button>' +
+          '</div>'
+        );
+        document.getElementById("retryFetch").addEventListener("click", fetchCards);
+        document.getElementById("backHomeErr").addEventListener("click", renderHome);
+      });
+  }
+
+  function runSession(cards, results, index) {
+    if (index >= cards.length) {
+      finishSession(cards, results);
+      return;
+    }
+
+    var card = cards[index];
+    var dots = cards.map(function (c, i) {
+      var cls = "dot";
+      if (results[i]) cls += " done";
+      else if (i === index) cls += " current";
+      return '<div class="' + cls + '"></div>';
+    }).join("");
+
+    render(
+      '<div class="stack">' +
+        '<div class="dots">' + dots + '</div>' +
+        '<div class="card-stage">' +
+          '<div class="flashcard" id="flashcard">' +
+            '<div class="face front">' +
+              '<div class="face-index">CARD ' + (index + 1) + ' OF ' + cards.length + '</div>' +
+              '<div class="face-word">' + esc(card.word) + '</div>' +
+              '<div class="face-pos">' + esc(card.pos || "") + '</div>' +
+              '<div class="face-hint">tap to flip</div>' +
+            '</div>' +
+            '<div class="face back">' +
+              '<div class="face-index">TRANSLATION</div>' +
+              '<div class="face-translation">' + esc(card.translation) + '</div>' +
+              '<div class="face-example">' + esc(card.example || "") + '</div>' +
+              '<div class="face-example-en">' + esc(card.exampleTranslation || "") + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="btn-row">' +
+          '<button class="btn btn-brick" id="stillLearning">Still Learning</button>' +
+          '<button class="btn btn-sage" id="gotIt">Got It</button>' +
+        '</div>' +
+      '</div>'
+    );
+
+    var flashcardEl = document.getElementById("flashcard");
+    flashcardEl.addEventListener("click", function () {
+      flashcardEl.classList.toggle("flipped");
+    });
+
+    function mark(status) {
+      results[index] = status;
+      saveTodayCache(cards, results, index);
+      var history = getHistory();
+      history.push({
+        word: card.word,
+        translation: card.translation,
+        pos: card.pos || "",
+        example: card.example || "",
+        exampleTranslation: card.exampleTranslation || "",
+        status: status,
+        date: todayStr()
+      });
+      saveHistory(history);
+      var next = index + 1;
+      saveTodayCache(cards, results, next);
+      runSession(cards, results, next);
+    }
+
+    document.getElementById("stillLearning").addEventListener("click", function () { mark("learning"); });
+    document.getElementById("gotIt").addEventListener("click", function () { mark("known"); });
+  }
+
+  function finishSession(cards, results) {
+    var streak = markDayComplete();
+    localStorage.removeItem(LS.today);
+    var known = results.filter(function (r) { return r === "known"; }).length;
+
+    render(
+      '<div class="stack">' +
+        '<div class="stamp"><span class="stamp-num">' + streak + '</span><span class="stamp-label">day streak</span></div>' +
+        '<p class="headline">Sprint complete</p>' +
+        '<p class="subline">' + known + ' of ' + cards.length + ' marked as known today. New cards tomorrow.</p>' +
+        '<button class="btn btn-primary" id="doneBackHome">Back to Home</button>' +
+      '</div>'
+    );
+    document.getElementById("doneBackHome").addEventListener("click", renderHome);
+  }
+
+  // ---------- Boot ----------
+  function boot() {
+    var setupDone = localStorage.getItem(LS.setup) === "true";
+    if (!setupDone) {
+      renderSetup();
+    } else {
+      renderHome();
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
