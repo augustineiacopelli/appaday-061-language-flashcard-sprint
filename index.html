@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/061.webmanifest">
 <script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="061" data-legacy-key="appaday-061-apikey" data-accent="#1F7A8C" defer></script>
 <title>Language Flashcard Sprint | AppADay 061</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -527,7 +528,6 @@
   "use strict";
 
   var LS = {
-    apikey: "appaday-061-apikey",
     language: "appaday-061-language",
     level: "appaday-061-level",
     setup: "appaday-061-setupdone",
@@ -622,7 +622,6 @@
     var overlay = document.createElement("div");
     overlay.className = "modal-overlay";
     overlay.id = "settingsOverlay";
-    var apikey = localStorage.getItem(LS.apikey) || "";
     var language = localStorage.getItem(LS.language) || LANGUAGES[0];
     var level = localStorage.getItem(LS.level) || LEVELS[0];
 
@@ -637,11 +636,7 @@
       '<div class="modal">' +
         '<button class="modal-close" id="closeSettings">CLOSE</button>' +
         '<h2>Settings</h2>' +
-        '<div class="field-group">' +
-          '<span class="field-label">Claude API Key</span>' +
-          '<input type="password" id="apikeyInput" placeholder="sk-ant-..." value="' + esc(apikey) + '">' +
-          '<span class="help-text">Stored only in this browser. Get a key at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.</span>' +
-        '</div>' +
+        '<div class="field-group" id="keyMount"><span class="help-text">The key manager is loading. If this stays, check your connection and reload.</span></div>' +
         '<div class="field-group">' +
           '<span class="field-label">Language</span>' +
           '<select id="languageSelect">' + langOpts + '</select>' +
@@ -654,6 +649,7 @@
         '<button class="btn btn-ghost" id="resetProgress">Reset All Progress</button>' +
       '</div>';
     document.body.appendChild(overlay);
+    if (window.AppKeys) window.AppKeys.mountSettings(document.getElementById("keyMount"));
 
     document.getElementById("closeSettings").addEventListener("click", function () {
       document.body.removeChild(overlay);
@@ -662,11 +658,9 @@
       if (e.target === overlay) document.body.removeChild(overlay);
     });
     document.getElementById("saveSettings").addEventListener("click", function () {
-      var key = document.getElementById("apikeyInput").value.trim();
       var lang = document.getElementById("languageSelect").value;
       var lvl = document.getElementById("levelSelect").value;
       var alreadySetup = localStorage.getItem(LS.setup) === "true";
-      localStorage.setItem(LS.apikey, key);
       localStorage.setItem(LS.language, lang);
       localStorage.setItem(LS.level, lvl);
       document.body.removeChild(overlay);
@@ -741,7 +735,6 @@
     var levelOpts = LEVELS.map(function (l) {
       return '<option value="' + esc(l) + '">' + esc(l) + "</option>";
     }).join("");
-    var hasKey = !!localStorage.getItem(LS.apikey);
 
     render(
       '<div class="stack">' +
@@ -761,17 +754,12 @@
           '<span class="field-label">Level</span>' +
           '<select id="setupLevel">' + levelOpts + '</select>' +
         '</div>' +
-        '<button class="btn btn-primary" id="setupStart"' + (hasKey ? '' : ' disabled') + '>Start My Streak</button>' +
-        (hasKey ?
-          '' :
-          '<button class="btn btn-ghost" id="setupOpenSettings">Add API Key in Settings</button>' +
-          '<p class="setup-note">Start My Streak unlocks once a Claude API key is saved in Settings.</p>'
-        ) +
+        '<button class="btn btn-primary" id="setupStart">Start My Streak</button>' +
+        '<p class="setup-note">The app asks for your Claude API key the first time you start a sprint. You can also add it any time with the gear button.</p>' +
       '</div>'
     );
 
     document.getElementById("setupStart").addEventListener("click", function () {
-      if (!localStorage.getItem(LS.apikey)) return;
       var lang = document.getElementById("setupLanguage").value;
       var lvl = document.getElementById("setupLevel").value;
       localStorage.setItem(LS.language, lang);
@@ -780,10 +768,6 @@
       renderHome();
     });
 
-    var setupOpenSettings = document.getElementById("setupOpenSettings");
-    if (setupOpenSettings) {
-      setupOpenSettings.addEventListener("click", openSettings);
-    }
   }
 
   // ---------- Home ----------
@@ -889,12 +873,12 @@
     );
   }
 
-  function fetchCards() {
-    var apikey = localStorage.getItem(LS.apikey);
+  async function fetchCards() {
+    var apikey = window.AppKeys ? await window.AppKeys.get() : null;
     if (!apikey) {
       render(
         '<div class="stack">' +
-          '<div class="error-box">Add a Claude API key in Settings before starting a sprint.</div>' +
+          '<div class="error-box">Add your Claude API key with the gear button to start a sprint.</div>' +
           '<button class="btn btn-primary" id="openSettingsFromError">Open Settings</button>' +
         '</div>'
       );
