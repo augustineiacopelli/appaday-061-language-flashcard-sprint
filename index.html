@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/061.webmanifest">
 <script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/models.js"></script>
 <script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="061" data-legacy-key="appaday-061-apikey" data-accent="#1F7A8C" defer></script>
 <title>Language Flashcard Sprint | AppADay 061</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -915,7 +916,7 @@
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-sonnet-5-5",
+        model: (window.AppModels ? window.AppModels.id("sonnet") : ""),
         max_tokens: 1500,
         messages: [{ role: "user", content: prompt }]
       })
@@ -1059,15 +1060,6 @@
   boot();
 })();
 
-async function getModel(tier = 'sonnet') {
-  try {
-    const response = await fetch('../config.json');
-    const config = await response.json();
-    return config.models[tier];
-  } catch {
-    return 'claude-sonnet-5-5';
-  }
-}
 </script>
 </body>
 </html>

@@ -16,7 +16,7 @@ The app runs entirely client-side as a single HTML file. Your Claude API key, ch
 
 ## Tech
 
-Single-file vanilla HTML, CSS, and JavaScript. No build step, no framework. Calls the Anthropic Messages API directly from the browser using `claude-sonnet-4-6`.
+Single-file vanilla HTML, CSS, and JavaScript. No build step, no framework. Calls the Anthropic Messages API directly from the browser using the current Claude Sonnet model.
 
 ## Live
 
